@@ -24,7 +24,6 @@ func print_info() {
 
 }
 
-
 func clr_buf() {
 
 	var cont bool = true
@@ -39,13 +38,9 @@ func clr_buf() {
 	return
 }
 
-/* function under development */
-
 func get_input() int {
 
 	var year int
-
-	/* under development */
 
 	for true {
 
@@ -64,14 +59,12 @@ func get_input() int {
 		} else {
 			break
 		}
-	}
 
-	/* under development */
+		fmt.Println()
+	}
 
 	return year
 }
-
-/* function under development */
 
 func first_day(year int) (int, bool) {
 
@@ -91,7 +84,7 @@ func first_day(year int) (int, bool) {
 	century_offset -= (century + 1)
 	century_offset *= 2
 
-	if (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0) {
+	if (year%4 == 0 && year%100 != 0) || (year%400 == 0) {
 		leap_year = true
 		year_offset -= 1
 	} else {
@@ -245,6 +238,7 @@ func main() {
 	var cal map[string]map[int][7]int
 
 	year = get_input()
+	fmt.Println()
 	day_no, leap_year = first_day(year)
 	cal = gen_cal(day_no, leap_year)
 	print_cal(cal)
