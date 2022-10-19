@@ -43,7 +43,6 @@ func get_input() int {
 	var year int
 
 	for true {
-
 		fmt.Printf("Enter the year: ")
 		_, error := fmt.Scanln(&year)
 
@@ -127,6 +126,7 @@ func gen_cal(day_no int, leap_year bool) map[string]map[int][7]int {
 
 		for j := 1; j <= nod; j++ {
 			date_lst[day_no] = j
+
 			if day_no == 6 {
 				cal[month][week_no] = date_lst
 				date_lst = [7]int{}
@@ -145,7 +145,7 @@ func gen_cal(day_no int, leap_year bool) map[string]map[int][7]int {
 	return cal
 }
 
-func print_week(k int, lm int, m int, keys []int, cal map[string]map[int][7]int) {
+func print_week(k, lm, m int, keys []int, cal map[string]map[int][7]int) {
 
 	var day int
 
@@ -158,6 +158,7 @@ func print_week(k int, lm int, m int, keys []int, cal map[string]map[int][7]int)
 
 		for j := 0; j < 7; j++ {
 			day = cal[months[m]][keys[k]][j]
+
 			if day == 0 {
 				fmt.Printf("    ")
 			} else if day < 10 {
