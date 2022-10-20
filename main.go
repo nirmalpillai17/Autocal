@@ -73,6 +73,12 @@ func qsort(arr []int) {
 	return
 }
 
+/* function under development */
+func str_rep(str string, not int) {
+
+}
+/* function under development */
+
 func print_info() {
 
 	fmt.Println("1. Generate the annual calendar of an year.")
@@ -85,6 +91,31 @@ func print_info() {
 	fmt.Println("Enter <i> and press <Enter> to list possible commands.")
 	fmt.Println("Type 'exit' at any promp and press <Enter> to exit the program.")
 
+}
+
+func print_months() {
+
+	const hline string = "\n+----------+----------+"
+	var rep string
+
+	for i := 1; i <= 6; i++ {
+		rep = "  "
+
+		fmt.Println(hline)
+		fmt.Printf("|")
+
+		for c, j := range [2]int{i, i + 6,} {
+			if (c == 1) && (j > 9) {
+				rep = " "
+			}
+			
+			fmt.Printf(" %s   %d%s|", months[j - 1], j, rep)
+		}
+	}
+
+	fmt.Println(hline)
+
+	return
 }
 
 func clr_buf() {
@@ -302,6 +333,7 @@ func main() {
 	var cal map[string]map[int][7]int
 
 	year = get_input()
+	print_months()
 	fmt.Println()
 	day_no, leap_year = first_day(year)
 	cal = gen_cal(day_no, leap_year)
