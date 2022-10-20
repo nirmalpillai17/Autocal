@@ -2,12 +2,71 @@ package main
 
 import (
 	"fmt"
-	"sort"
 	"strings"
 )
 
 var months [12]string = [12]string{
 	"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+}
+
+func qsort(arr []int) {
+
+	var high int = len(arr) - 1
+
+	var pivot int
+	var pi int
+
+	var if_sorted func() bool
+	var partition func(lo, hi int) int
+	var init_sort func(lo, hi int)
+
+	if_sorted = func() bool {
+
+		for i := 0; i < high; i++ {
+			if arr[i] > arr[i+1] {
+				return false
+			}
+		}
+
+		return true
+	}
+
+	partition = func(lo, hi int) int {
+
+		pivot = arr[lo]
+
+		for true {
+			for arr[lo] < pivot {
+				lo++
+			}
+
+			for arr[hi] > pivot {
+				hi--
+			}
+
+			if lo >= hi {
+				return hi
+			}
+
+			arr[lo], arr[hi] = arr[hi], arr[lo]
+		}
+
+		return 0
+	}
+
+	init_sort = func(lo, hi int) {
+
+		if lo < hi {
+			pi = partition(lo, hi)
+
+			init_sort(lo, pi)
+			init_sort(pi+1, hi)
+		}
+	}
+
+	if !if_sorted() {
+		init_sort(0, high)
+	}
 }
 
 func print_info() {
@@ -205,8 +264,8 @@ func print_cal(cal map[string]map[int][7]int) {
 			keys_m2 = append(keys_m2, k)
 		}
 
-		sort.Ints(keys_m1)
-		sort.Ints(keys_m2)
+		qsort(keys_m1)
+		qsort(keys_m2)
 
 		lm1 = len(cal[months[m1]])
 		lm2 = len(cal[months[m2]])
