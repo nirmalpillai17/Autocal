@@ -62,11 +62,15 @@ func qsort(arr []int) {
 			init_sort(lo, pi)
 			init_sort(pi+1, hi)
 		}
+
+		return
 	}
 
 	if !if_sorted() {
 		init_sort(0, high)
 	}
+
+	return
 }
 
 func print_info() {
