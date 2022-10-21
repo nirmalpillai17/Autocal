@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strings"
 )
 
 var months [12]string = [12]string{
@@ -73,11 +72,16 @@ func qsort(arr []int) {
 	return
 }
 
-/* function under development */
-func str_rep(str string, not int) {
+func str_rep(str string, not int) string {
 
+	var str_out string
+
+	for i := 1; i <= not; i++ {
+		str_out += str
+	}
+
+	return str_out
 }
-/* function under development */
 
 func print_info() {
 
@@ -104,12 +108,12 @@ func print_months() {
 		fmt.Println(hline)
 		fmt.Printf("|")
 
-		for c, j := range [2]int{i, i + 6,} {
+		for c, j := range [2]int{i, i + 6} {
 			if (c == 1) && (j > 9) {
 				rep = " "
 			}
-			
-			fmt.Printf(" %s   %d%s|", months[j - 1], j, rep)
+
+			fmt.Printf(" %s   %d%s|", months[j-1], j, rep)
 		}
 	}
 
@@ -262,7 +266,7 @@ func print_week(k, lm, m int, keys []int, cal map[string]map[int][7]int) {
 			}
 		}
 	} else {
-		fmt.Printf("|%s", strings.Repeat(" ", 30))
+		fmt.Printf("|%s", str_rep(" ", 30))
 	}
 
 	return
@@ -283,7 +287,7 @@ func print_cal(cal map[string]map[int][7]int) {
 		m1 = 2 * i
 		m2 = m1 + 1
 
-		fmt.Println(strings.Repeat(" ", 14), months[m1], strings.Repeat(" ", 30), months[m2])
+		fmt.Println(str_rep(" ", 14), months[m1], str_rep(" ", 30), months[m2])
 		fmt.Println(hline, " ", hline)
 		fmt.Println(dline, " ", dline)
 		fmt.Println(hline, " ", hline)
