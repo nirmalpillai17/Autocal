@@ -83,6 +83,25 @@ func str_rep(str string, not int) string {
 	return str_out
 }
 
+/* function to convert string to integer */
+/* under development */
+
+func stoi(str string) (bool, int) {
+
+	var num int
+	var is_num bool = true
+
+	_, e := fmt.Sscan(str, &num)
+
+	if e != nil {
+		is_num = false
+	}
+
+	return is_num, num
+}
+
+/* under development */
+
 func print_info() {
 
 	fmt.Println("1. Generate the annual calendar of an year.")
@@ -336,6 +355,11 @@ func main() {
 	var leap_year bool
 	var cal map[string]map[int][7]int
 
+	/* testing function stoi */
+	b, n := stoi("abcd")
+	fmt.Println(b, n)
+	/* testing function stoi */
+	
 	year = get_input()
 	print_months()
 	fmt.Println()
