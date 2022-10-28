@@ -86,19 +86,18 @@ func str_rep(str string, not int) string {
 /* function to convert string to integer */
 /* under development */
 
-/* should probably use Sscanf to fix the problem mention below */
-
 func stoi(str string) (bool, int) {
 
 	var num int
+	var isint bool = true
 
-	_, e := fmt.Sscan(str, &num)  /* u will have to change this at some point */
+	_, e := fmt.Sscanf(str,"%d\n", &num)
 
 	if e != nil {
-		return false, num  /* i'm too lazy to make variables but do reconsider sometime later*/
+		isint = false
 	}
 
-	return true, num
+	return isint, num
 }
 
 /* under development */
@@ -156,14 +155,7 @@ func clr_buf() {
 	return
 }
 
-/* function under devlopment */
-
-/* there is a problem when entering values like 2004dfsdf
-if there is a number preceding a string, the number is obtained */
-
-/* also space characters are interpreted as numbers */
-
-/* the behaviour should be changed in stoi function */
+/* function under development */
 
 func get_input(t rune) int {
 
@@ -182,7 +174,7 @@ func get_input(t rune) int {
 	for true {
 		fmt.Printf("Enter the %s: ", prompt)
 		_, error := fmt.Scanln(&input)
-		
+
 		if error != nil {
 			if error.Error() != "unexpected newline" {
 				clr_buf()
@@ -191,50 +183,24 @@ func get_input(t rune) int {
 
 		if input == "exit" {
 			fmt.Println("[Abort]")
-			return 0  /* changes to be made  - it should somehow stop the program */
+			return -1
 		} else {
 			isint, num = stoi(input)
 			if isint {
-				ok = validate_inp(t, num)
-				if ok {
+				if ok = validate_inp(t, num); ok {
 					return num
 				}
 			} else {
-				fmt.Printf("[Error] : '%s' is not a valid command\n", input)
+				fmt.Printf("[Error] : '%s' is not a valid command!\n", input)
+				input = ""
 			}
 		}
-	}
-
-	return 0  /* not the best choice i think but it's okay since i'm stupid */
-
-
-	/* code to be removed */
-/*
-	var year int
-
-	for true {
-		fmt.Printf("Enter the year: ")
-		_, error := fmt.Scanln(&year) */
-
-		/* clear input buffer stream if any */
-/*
-		if error != nil {
-			if error.Error() != "unexpected newline" {
-				clr_buf()
-			}
-			fmt.Println("[Error] : Input not an year")
-		} else if year < 1000 || year > 9999 {
-			fmt.Println("[Error] : Input not in range 1000 - 9999")
-		} else {
-			break
-		}
-
 		fmt.Println()
 	}
 
-	return year */
-
+	return -1
 }
+
 /* function under development */
 
 func validate_inp(t rune, input int) bool {
@@ -440,6 +406,9 @@ func main() {
 	/* testing function stoi */
 	
 	year = get_input('y')
+	if year == -1 {
+		return
+	}
 	print_months()
 	fmt.Println()
 	day_no, leap_year = first_day(year)
