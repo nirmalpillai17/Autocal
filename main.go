@@ -2,96 +2,33 @@ package main
 
 import (
 	"fmt"
+	"sort"
+	"strings"
 )
 
 var months [12]string = [12]string{
 	"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 }
 
-func qsort(arr []int) {
-
-	var high int = len(arr) - 1
-
-	var pivot int
-	var pi int
-
-	var if_sorted func() bool
-	var partition func(lo, hi int) int
-	var init_sort func(lo, hi int)
-
-	if_sorted = func() bool {
-
-		for i := 0; i < high; i++ {
-			if arr[i] > arr[i+1] {
-				return false
-			}
-		}
-
-		return true
-	}
-
-	partition = func(lo, hi int) int {
-
-		pivot = arr[lo]
-
-		for true {
-			for arr[lo] < pivot {
-				lo++
-			}
-
-			for arr[hi] > pivot {
-				hi--
-			}
-
-			if lo >= hi {
-				return hi
-			}
-
-			arr[lo], arr[hi] = arr[hi], arr[lo]
-		}
-
-		return 0
-	}
-
-	init_sort = func(lo, hi int) {
-
-		if lo < hi {
-			pi = partition(lo, hi)
-
-			init_sort(lo, pi)
-			init_sort(pi+1, hi)
-		}
-
-		return
-	}
-
-	if !if_sorted() {
-		init_sort(0, high)
-	}
-
-	return
-}
-
 func str_rep(str string, not int) string {
+	// This function is meant as an alias
+	// to strings.Repeat() for ease of use.
 
-	var str_out string
-
-	for i := 1; i <= not; i++ {
-		str_out += str
-	}
-
-	return str_out
+	return strings.Repeat(str, not)
 }
-
-/* function to convert string to integer */
-/* under development */
 
 func stoi(str string) (bool, int) {
+	// - Function to convert string input from
+	//   get_input() to integer datatype.
+	// - Uses fmt.Sscanf() to read bytes from
+	//   variable str to variable num.
+	// - Returns (False, 0) if str is not a
+	//   number and (True, num) otherwise.
 
-	var num int
+	var num int = 0
 	var isint bool = true
 
-	_, e := fmt.Sscanf(str,"%d\n", &num)
+	_, e := fmt.Sscanf(str, "%d\n", &num)
 
 	if e != nil {
 		isint = false
@@ -99,8 +36,6 @@ func stoi(str string) (bool, int) {
 
 	return isint, num
 }
-
-/* under development */
 
 func print_info() {
 
@@ -142,6 +77,12 @@ func print_months() {
 }
 
 func clr_buf() {
+	// - Function to clear input buffer stream
+	//   by repeatedly calling fmt.Scanln()
+	//   until it returns no errors.
+	// - This function is invoked only if input
+	//   contains more than one space separated
+	//   value.
 
 	var cont bool = true
 
@@ -157,19 +98,14 @@ func clr_buf() {
 
 /* function under development */
 
-func get_input(t rune) int {
+func get_input(prompt string) int {
+	// Function gets the input value and 
+	// returns an integer. Handles input 
+	// data type errors.
 
-	var prompt, input string
-	var isint, ok bool
+	var input string
+	var isint bool
 	var num int
-
-	if t == 'y' {
-		prompt = "year"
-	} else if t == 'm' {
-		prompt = "month"
-	} else {
-		prompt = "day"
-	}
 
 	for true {
 		fmt.Printf("Enter the %s: ", prompt)
@@ -187,47 +123,90 @@ func get_input(t rune) int {
 		} else {
 			isint, num = stoi(input)
 			if isint {
-				if ok = validate_inp(t, num); ok {
-					return num
-				}
+				return num
 			} else {
-				fmt.Printf("[Error] : '%s' is not a valid command!\n", input)
+				fmt.Printf("[Error] : '%s' is not a valid input!\n", input)
 				input = ""
 			}
 		}
+
 		fmt.Println()
 	}
 
 	return -1
 }
 
-/* function under development */
+func get_year() int {
 
-func validate_inp(t rune, input int) bool {
-	
-	if t == 'y' {
-		if input < 1000 || input > 9999 {
+	var year int
+
+	for true {
+		year = get_input("year")
+
+		if year < 1000 || year > 9999 {
 			fmt.Println("[Error] : Input not in range 1000 - 9999")
-			return false
+		} else {
+			return year
 		}
-	} else if t == 'm' {
-		if input < 1 || input > 12 {
-			fmt.Println("[Error] : Input not in range 1 - 12")
-			return false
-		}
-	} else {
-		/* changes to be made regarding no of days */
-		if input < 1 || input > 31 {
-			fmt.Println("[Error] : Input not in range 1 - 31")
-			return false
-		}
-		/* changes to be made regarding no of days */
 	}
 
-	return true
+	return -1
 }
 
-func first_day(year int) (int, bool) {
+func get_month() (int, int) {
+
+	var year int
+	var month int
+
+	year = get_year()
+
+	for true {
+		month = get_input("month")
+
+		if month < 1 || month > 12 {
+			fmt.Println("[Error] : Input not in range 1 - 12")
+		} else {
+			return year, (month - 1)
+		}
+	}
+
+	return -1, -1
+}
+
+func get_day() (int, int, int) {
+
+	var year int
+	var month int
+	var day int
+	var nod int
+
+	year, month = get_month()
+
+	nod = find_nod(month, if_leap(year))
+
+	for true {
+		day = get_input("day")
+
+		if day < 1 || day > nod {
+			fmt.Printf("[Error] : Input not in range 1 - %d\n", nod)
+		} else {
+			return year, month, day
+		}
+	}
+
+	return -1, -1, -1
+}
+
+func if_leap(year int) bool {
+
+	if (year%4 == 0 && year%100 != 0) || (year%400 == 0) {
+		return true
+	} else {
+		return false
+	}
+}
+
+func first_day(year int) int {
 
 	var century int = year / 100
 	var century_offset int = 4
@@ -235,7 +214,6 @@ func first_day(year int) (int, bool) {
 	var month_offset int = 0
 	var year_offset int = (((year % 100) * 5) / 4) % 7
 
-	var leap_year bool
 	var day_no int
 
 	for century_offset <= century {
@@ -245,11 +223,8 @@ func first_day(year int) (int, bool) {
 	century_offset -= (century + 1)
 	century_offset *= 2
 
-	if (year%4 == 0 && year%100 != 0) || (year%400 == 0) {
-		leap_year = true
+	if if_leap(year) {
 		year_offset -= 1
-	} else {
-		leap_year = false
 	}
 
 	day_no = (century_offset + year_offset + month_offset + day_offset) % 7
@@ -260,31 +235,43 @@ func first_day(year int) (int, bool) {
 		day_no--
 	}
 
-	return day_no, leap_year
+	return day_no
 }
 
-func gen_cal(day_no int, leap_year bool) map[string]map[int][7]int {
+func find_nod(month int, leap_year bool) int {
+
+	var nod int
+
+	if (month == 3) || (month == 5) || (month == 8) || (month == 10) {
+		nod = 30
+	} else if month == 1 {
+		if leap_year {
+			nod = 29
+		} else {
+			nod = 28
+		}
+	} else {
+		nod = 31
+	}
+
+	return nod
+}
+
+func gen_cal(day_no int, year int) map[string]map[int][7]int {
 
 	cal := make(map[string]map[int][7]int)
 
 	var week_no int = 1
 	var date_lst [7]int
+	var leap_year bool
 	var nod int
+
+	leap_year = if_leap(year)
 
 	for i, month := range months {
 		cal[month] = map[int][7]int{}
 
-		if (i == 3) || (i == 5) || (i == 8) || (i == 10) {
-			nod = 30
-		} else if i == 1 {
-			if leap_year {
-				nod = 29
-			} else {
-				nod = 28
-			}
-		} else {
-			nod = 31
-		}
+		nod = find_nod(i, leap_year)
 
 		for j := 1; j <= nod; j++ {
 			date_lst[day_no] = j
@@ -367,8 +354,8 @@ func print_cal(cal map[string]map[int][7]int) {
 			keys_m2 = append(keys_m2, k)
 		}
 
-		qsort(keys_m1)
-		qsort(keys_m2)
+		sort.Ints(keys_m1)
+		sort.Ints(keys_m2)
 
 		lm1 = len(cal[months[m1]])
 		lm2 = len(cal[months[m2]])
@@ -397,22 +384,26 @@ func main() {
 
 	var year int
 	var day_no int
-	var leap_year bool
+	var month int
+	var day int
 	var cal map[string]map[int][7]int
 
 	/* testing function stoi */
 	b, n := stoi("3468")
 	fmt.Println(b, n)
 	/* testing function stoi */
-	
-	year = get_input('y')
+
+	year, month, day = get_day()
+	fmt.Println(year)
+	fmt.Println(month)
+	fmt.Println(day)
 	if year == -1 {
 		return
 	}
 	print_months()
 	fmt.Println()
-	day_no, leap_year = first_day(year)
-	cal = gen_cal(day_no, leap_year)
+	day_no = first_day(year)
+	cal = gen_cal(day_no, year)
 	print_cal(cal)
 
 }
