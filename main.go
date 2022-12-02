@@ -17,9 +17,9 @@ func str_rep(str string, not int) string {
 	return strings.Repeat(str, not)
 }
 
-func stoi(str string) (bool, int) {
+func strToInt(str string) (bool, int) {
 	// - Function to convert string input from
-	//   get_input() to integer datatype.
+	//   getInput() to integer datatype.
 	// - Uses fmt.Sscanf() to read bytes from
 	//   variable str to variable num.
 	// - Returns (False, 0) if str is not a
@@ -37,7 +37,7 @@ func stoi(str string) (bool, int) {
 	return isint, num
 }
 
-func print_info() {
+func printInfo() {
 
 	fmt.Println("1. Generate the annual calendar of an year.")
 	fmt.Println("2. Generate the calendar of a month.")
@@ -51,7 +51,7 @@ func print_info() {
 
 }
 
-func print_months() {
+func printMonths() {
 
 	const hline string = "\n+----------+----------+"
 	var rep string
@@ -76,7 +76,7 @@ func print_months() {
 	return
 }
 
-func clr_buf() {
+func clearBuffer() {
 	// - Function to clear input buffer stream
 	//   by repeatedly calling fmt.Scanln()
 	//   until it returns no errors.
@@ -98,9 +98,9 @@ func clr_buf() {
 
 /* function under development */
 
-func get_input(prompt string) int {
-	// Function gets the input value and 
-	// returns an integer. Handles input 
+func getInput(prompt string) int {
+	// Function gets the input value and
+	// returns an integer. Handles input
 	// data type errors.
 
 	var input string
@@ -113,7 +113,7 @@ func get_input(prompt string) int {
 
 		if error != nil {
 			if error.Error() != "unexpected newline" {
-				clr_buf()
+				clearBuffer()
 			}
 		}
 
@@ -121,7 +121,7 @@ func get_input(prompt string) int {
 			fmt.Println("[Abort]")
 			return -1
 		} else {
-			isint, num = stoi(input)
+			isint, num = strToInt(input)
 			if isint {
 				return num
 			} else {
@@ -136,12 +136,12 @@ func get_input(prompt string) int {
 	return -1
 }
 
-func get_year() int {
+func getYear() int {
 
 	var year int
 
 	for true {
-		year = get_input("year")
+		year = getInput("year")
 
 		if year < 1000 || year > 9999 {
 			fmt.Println("[Error] : Input not in range 1000 - 9999")
@@ -153,15 +153,15 @@ func get_year() int {
 	return -1
 }
 
-func get_month() (int, int) {
+func getMonth() (int, int) {
 
 	var year int
 	var month int
 
-	year = get_year()
+	year = getYear()
 
 	for true {
-		month = get_input("month")
+		month = getInput("month")
 
 		if month < 1 || month > 12 {
 			fmt.Println("[Error] : Input not in range 1 - 12")
@@ -173,19 +173,18 @@ func get_month() (int, int) {
 	return -1, -1
 }
 
-func get_day() (int, int, int) {
+func getDay() (int, int, int) {
 
 	var year int
 	var month int
 	var day int
 	var nod int
 
-	year, month = get_month()
-
-	nod = find_nod(month, if_leap(year))
+	year, month = getMonth()
+	nod = findNOD(month, ifLeap(year))
 
 	for true {
-		day = get_input("day")
+		day = getInput("date")
 
 		if day < 1 || day > nod {
 			fmt.Printf("[Error] : Input not in range 1 - %d\n", nod)
@@ -197,7 +196,24 @@ func get_day() (int, int, int) {
 	return -1, -1, -1
 }
 
-func if_leap(year int) bool {
+func getChoice() int {
+
+	var choice int
+
+	for true {
+		choice = getInput("choice")
+
+		if choice < 1 || choice > 6 {
+			fmt.Println("[Error] : Input not in range 1 - 6")
+		} else {
+			return choice
+		}
+	}
+
+	return -1
+}
+
+func ifLeap(year int) bool {
 
 	if (year%4 == 0 && year%100 != 0) || (year%400 == 0) {
 		return true
@@ -206,15 +222,14 @@ func if_leap(year int) bool {
 	}
 }
 
-func first_day(year int) int {
+func firstDay(year int) int {
 
 	var century int = year / 100
 	var century_offset int = 4
 	var day_offset int = 1
 	var month_offset int = 0
+	var day_no int = 0
 	var year_offset int = (((year % 100) * 5) / 4) % 7
-
-	var day_no int
 
 	for century_offset <= century {
 		century_offset += 4
@@ -223,7 +238,7 @@ func first_day(year int) int {
 	century_offset -= (century + 1)
 	century_offset *= 2
 
-	if if_leap(year) {
+	if ifLeap(year) {
 		year_offset -= 1
 	}
 
@@ -238,7 +253,9 @@ func first_day(year int) int {
 	return day_no
 }
 
-func find_nod(month int, leap_year bool) int {
+func findNOD(month int, leap_year bool) int {
+	// Function to find the number of days
+	// in a given month of a given year.
 
 	var nod int
 
@@ -257,8 +274,12 @@ func find_nod(month int, leap_year bool) int {
 	return nod
 }
 
-func gen_cal(day_no int, year int) map[string]map[int][7]int {
+func genCal(year, m int) map[string]map[int][7]int {
+	// The function returns calendar for entire year
+	// if second parameter m = -1. Else returns the
+	// calendar for the month specified by m.
 
+	var day_no int = firstDay(year)
 	cal := make(map[string]map[int][7]int)
 
 	var week_no int = 1
@@ -266,12 +287,31 @@ func gen_cal(day_no int, year int) map[string]map[int][7]int {
 	var leap_year bool
 	var nod int
 
-	leap_year = if_leap(year)
+	leap_year = ifLeap(year)
 
-	for i, month := range months {
+	var skipCal func(i int)
+	var monthCal func(i int, month string)
+
+	skipCal = func(i int) {
+
+		nod = findNOD(i, leap_year)
+
+		for j := 1; j <= nod; j++ {
+			if day_no == 6 {
+				day_no = 0
+				week_no++
+			} else if j == nod {
+				day_no++
+			} else {
+				day_no++
+			}
+		}
+	}
+
+	monthCal = func(i int, month string) {
+
 		cal[month] = map[int][7]int{}
-
-		nod = find_nod(i, leap_year)
+		nod = findNOD(i, leap_year)
 
 		for j := 1; j <= nod; j++ {
 			date_lst[day_no] = j
@@ -291,10 +331,18 @@ func gen_cal(day_no int, year int) map[string]map[int][7]int {
 		}
 	}
 
+	for i, month := range months {
+		if m == -1 || i == m {
+			monthCal(i, month)
+		} else {
+			skipCal(i)
+		}
+	}
+
 	return cal
 }
 
-func print_week(k, lm, m int, keys []int, cal map[string]map[int][7]int) {
+func printWeek(k, lm, m int, keys []int, cal map[string]map[int][7]int) {
 
 	var day int
 
@@ -323,7 +371,7 @@ func print_week(k, lm, m int, keys []int, cal map[string]map[int][7]int) {
 	return
 }
 
-func print_cal(cal map[string]map[int][7]int) {
+func printCal(cal map[string]map[int][7]int) {
 
 	const hline string = "+------------------------------+"
 	const dline string = "|Wk  Mo  Tu  We  Th  Fr  Sa  Su|"
@@ -343,8 +391,11 @@ func print_cal(cal map[string]map[int][7]int) {
 		fmt.Println(dline, " ", dline)
 		fmt.Println(hline, " ", hline)
 
-		var keys_m1 []int = make([]int, 0, len(cal[months[m1]]))
-		var keys_m2 []int = make([]int, 0, len(cal[months[m2]]))
+		lm1 = len(cal[months[m1]])
+		lm2 = len(cal[months[m2]])
+
+		var keys_m1 []int = make([]int, 0, lm1)
+		var keys_m2 []int = make([]int, 0, lm2)
 
 		for k := range cal[months[m1]] {
 			keys_m1 = append(keys_m1, k)
@@ -357,9 +408,6 @@ func print_cal(cal map[string]map[int][7]int) {
 		sort.Ints(keys_m1)
 		sort.Ints(keys_m2)
 
-		lm1 = len(cal[months[m1]])
-		lm2 = len(cal[months[m2]])
-
 		if lm1 > lm2 {
 			now = lm1
 		} else {
@@ -367,11 +415,11 @@ func print_cal(cal map[string]map[int][7]int) {
 		}
 
 		for k := 0; k < now; k++ {
-			print_week(k, lm1, m1, keys_m1, cal)
-			fmt.Printf("|%s", "   ")
+			printWeek(k, lm1, m1, keys_m1, cal)
+			fmt.Printf("|   ")
 
-			print_week(k, lm2, m2, keys_m2, cal)
-			fmt.Printf("|\n")
+			printWeek(k, lm2, m2, keys_m2, cal)
+			fmt.Println("|")
 		}
 
 		fmt.Println(hline, " ", hline)
@@ -380,30 +428,65 @@ func print_cal(cal map[string]map[int][7]int) {
 	return
 }
 
+func calOfYear() {
+
+	var year int
+	var cal map[string]map[int][7]int
+
+	year = getYear()
+	cal = genCal(year, -1)
+
+	printCal(cal)
+
+	return
+}
+
+func calOfMonth() {
+
+	var year int
+	var month int
+	var cal map[string]map[int][7]int
+	const hline string = "+------------------------------+"
+	const dline string = "|Wk  Mo  Tu  We  Th  Fr  Sa  Su|"
+
+	year, month = getMonth()
+	cal = genCal(year, month)
+
+	var length int = len(cal[months[month]])
+	var keys []int = make([]int, 0, length)
+
+	for k := range cal[months[month]] {
+		keys = append(keys, k)
+	}
+
+	sort.Ints(keys)
+
+	fmt.Println(hline)
+	fmt.Println(dline)
+	fmt.Println(hline)
+
+	for key := range keys {
+		printWeek(key, length, month, keys, cal)
+		fmt.Println("|")
+	}
+
+	fmt.Println(hline)
+}
+
 func main() {
 
 	var year int
-	var day_no int
-	var month int
-	var day int
-	var cal map[string]map[int][7]int
 
-	/* testing function stoi */
-	b, n := stoi("3468")
+	/* testing function strToInt */
+	b, n := strToInt("3468")
 	fmt.Println(b, n)
-	/* testing function stoi */
-
-	year, month, day = get_day()
-	fmt.Println(year)
-	fmt.Println(month)
-	fmt.Println(day)
+	/* testing function strToInt */
 	if year == -1 {
 		return
 	}
-	print_months()
+	printMonths()
 	fmt.Println()
-	day_no = first_day(year)
-	cal = gen_cal(day_no, year)
-	print_cal(cal)
+	calOfYear()
+	calOfMonth()
 
 }
