@@ -136,64 +136,52 @@ func getInput(prompt string) int {
 	return -1
 }
 
-func getYear() int {
-
-	var year int
+func getYear(year *int) {
 
 	for true {
-		year = getInput("year")
+		*year = getInput("year")
 
-		if year < 1000 || year > 9999 {
+		if *year < 1000 || *year > 9999 {
 			fmt.Println("[Error] : Input not in range 1000 - 9999")
 		} else {
-			return year
+			return
 		}
 	}
-
-	return -1
 }
 
-func getMonth() (int, int) {
+func getMonth(year, month *int) {
 
-	var year int
-	var month int
-
-	year = getYear()
+	getYear(year)
 
 	for true {
-		month = getInput("month")
+		*month = getInput("month")
 
-		if month < 1 || month > 12 {
+		if *month < 1 || *month > 12 {
 			fmt.Println("[Error] : Input not in range 1 - 12")
 		} else {
-			return year, (month - 1)
+			*month -= 1
+			return
 		}
 	}
-
-	return -1, -1
 }
 
-func getDay() (int, int, int) {
+func getDay(year, month, day *int) {
 
-	var year int
-	var month int
-	var day int
 	var nod int
 
-	year, month = getMonth()
-	nod = findNOD(month, ifLeap(year))
+	getMonth(year, month)
+
+	nod = findNOD(*month, ifLeap(*year))
 
 	for true {
-		day = getInput("date")
+		*day = getInput("date")
 
-		if day < 1 || day > nod {
+		if *day < 1 || *day > nod {
 			fmt.Printf("[Error] : Input not in range 1 - %d\n", nod)
 		} else {
-			return year, month, day
+			return
 		}
 	}
-
-	return -1, -1, -1
 }
 
 func getChoice() int {
@@ -371,7 +359,14 @@ func printWeek(k, lm, m int, keys []int, cal map[string]map[int][7]int) {
 	return
 }
 
-func printCal(cal map[string]map[int][7]int) {
+func calOfYear() {
+
+	var year int
+	var cal map[string]map[int][7]int
+
+	getYear(&year)
+
+	cal = genCal(year, -1)
 
 	const hline string = "+------------------------------+"
 	const dline string = "|Wk  Mo  Tu  We  Th  Fr  Sa  Su|"
@@ -428,28 +423,16 @@ func printCal(cal map[string]map[int][7]int) {
 	return
 }
 
-func calOfYear() {
-
-	var year int
-	var cal map[string]map[int][7]int
-
-	year = getYear()
-	cal = genCal(year, -1)
-
-	printCal(cal)
-
-	return
-}
-
 func calOfMonth() {
 
-	var year int
-	var month int
+	var year, month int
 	var cal map[string]map[int][7]int
+
 	const hline string = "+------------------------------+"
 	const dline string = "|Wk  Mo  Tu  We  Th  Fr  Sa  Su|"
 
-	year, month = getMonth()
+	getMonth(&year, &month)
+
 	cal = genCal(year, month)
 
 	var length int = len(cal[months[month]])
@@ -460,6 +443,8 @@ func calOfMonth() {
 	}
 
 	sort.Ints(keys)
+
+	fmt.Println(str_rep(" ", 14), months[month])
 
 	fmt.Println(hline)
 	fmt.Println(dline)
@@ -475,18 +460,15 @@ func calOfMonth() {
 
 func main() {
 
-	var year int
+	//var day int
 
 	/* testing function strToInt */
 	b, n := strToInt("3468")
 	fmt.Println(b, n)
 	/* testing function strToInt */
-	if year == -1 {
-		return
-	}
+
 	printMonths()
 	fmt.Println()
-	calOfYear()
 	calOfMonth()
 
 }
