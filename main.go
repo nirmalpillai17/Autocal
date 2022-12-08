@@ -10,6 +10,9 @@ var months [12]string = [12]string{
 	"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 }
 
+const hline string = "+------------------------------+"
+const dline string = "|Wk  Mo  Tu  We  Th  Fr  Sa  Su|"
+
 func str_rep(str string, not int) string {
 	// This function is meant as an alias
 	// to strings.Repeat() for ease of use.
@@ -49,6 +52,7 @@ func printInfo() {
 	fmt.Println("Enter <i> and press <Enter> to list possible commands.")
 	fmt.Println("Type 'exit' at any promp and press <Enter> to exit the program.")
 
+	return
 }
 
 func printMonths() {
@@ -190,8 +194,8 @@ func getChoice() int {
 
 	for true {
 		choice = getInput("choice")
-
-		if choice < 1 || choice > 6 {
+		// this part of function is under development take a look at it later bro
+		if (choice < 1 || choice > 6) && choice != -1 { // changes to be made here also
 			fmt.Println("[Error] : Input not in range 1 - 6")
 		} else {
 			return choice
@@ -277,12 +281,12 @@ func genCal(year, m int) map[string]map[int][7]int {
 
 	leap_year = ifLeap(year)
 
-	var skipCal func(i int)
-	var monthCal func(i int, month string)
+	var skipCal func(i *int)
+	var monthCal func(i *int, month string)
 
-	skipCal = func(i int) {
+	skipCal = func(i *int) {
 
-		nod = findNOD(i, leap_year)
+		nod = findNOD(*i, leap_year)
 
 		for j := 1; j <= nod; j++ {
 			if day_no == 6 {
@@ -296,10 +300,10 @@ func genCal(year, m int) map[string]map[int][7]int {
 		}
 	}
 
-	monthCal = func(i int, month string) {
+	monthCal = func(i *int, month string) {
 
 		cal[month] = map[int][7]int{}
-		nod = findNOD(i, leap_year)
+		nod = findNOD(*i, leap_year)
 
 		for j := 1; j <= nod; j++ {
 			date_lst[day_no] = j
@@ -321,9 +325,9 @@ func genCal(year, m int) map[string]map[int][7]int {
 
 	for i, month := range months {
 		if m == -1 || i == m {
-			monthCal(i, month)
+			monthCal(&i, month)
 		} else {
-			skipCal(i)
+			skipCal(&i)
 		}
 	}
 
@@ -367,9 +371,6 @@ func calOfYear() {
 	getYear(&year)
 
 	cal = genCal(year, -1)
-
-	const hline string = "+------------------------------+"
-	const dline string = "|Wk  Mo  Tu  We  Th  Fr  Sa  Su|"
 
 	var now int /* short for no. of weeks */
 	var m1 int  /* first month */
@@ -428,9 +429,6 @@ func calOfMonth() {
 	var year, month int
 	var cal map[string]map[int][7]int
 
-	const hline string = "+------------------------------+"
-	const dline string = "|Wk  Mo  Tu  We  Th  Fr  Sa  Su|"
-
 	getMonth(&year, &month)
 
 	cal = genCal(year, month)
@@ -460,15 +458,23 @@ func calOfMonth() {
 
 func main() {
 
-	//var day int
+	var choice int
 
-	/* testing function strToInt */
-	b, n := strToInt("3468")
-	fmt.Println(b, n)
-	/* testing function strToInt */
+	printInfo()
 
-	printMonths()
-	fmt.Println()
-	calOfMonth()
+	for true {
+
+		// changes to be made here
+		choice = getChoice()
+
+		switch choice {
+		case -1:
+			return
+		case 1:
+			calOfYear()
+		case 2:
+			calOfMonth()
+		}
+	}
 
 }
