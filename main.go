@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 )
@@ -57,14 +58,14 @@ func printInfo() {
 
 func printMonths() {
 
-	const hline string = "\n+----------+----------+"
 	var rep string
+	const hline string = "\n+----------+----------+"
 
 	for i := 1; i <= 6; i++ {
-		rep = "  "
-
 		fmt.Println(hline)
 		fmt.Printf("|")
+
+		rep = "  "
 
 		for c, j := range [2]int{i, i + 6} {
 			if (c == 1) && (j > 9) {
@@ -106,10 +107,10 @@ func getInput(prompt string) int {
 	// Function gets the input value and
 	// returns an integer. Handles input
 	// data type errors.
-
-	var input string
-	var isint bool
+	
 	var num int
+	var isint bool
+	var input string
 
 	for true {
 		fmt.Printf("Enter the %s: ", prompt)
@@ -123,7 +124,7 @@ func getInput(prompt string) int {
 
 		if input == "exit" {
 			fmt.Println("[Abort]")
-			return -1
+			os.Exit(0)
 		} else {
 			isint, num = strToInt(input)
 			if isint {
@@ -216,11 +217,11 @@ func ifLeap(year int) bool {
 
 func firstDay(year int) int {
 
-	var century int = year / 100
-	var century_offset int = 4
+	var day_no int = 0
 	var day_offset int = 1
 	var month_offset int = 0
-	var day_no int = 0
+	var century_offset int = 4
+	var century int = year / 100
 	var year_offset int = (((year % 100) * 5) / 4) % 7
 
 	for century_offset <= century {
@@ -274,10 +275,10 @@ func genCal(year, m int) map[string]map[int][7]int {
 	var day_no int = firstDay(year)
 	cal := make(map[string]map[int][7]int)
 
-	var week_no int = 1
-	var date_lst [7]int
-	var leap_year bool
 	var nod int
+	var leap_year bool
+	var date_lst [7]int
+	var week_no int = 1
 
 	leap_year = ifLeap(year)
 
@@ -298,6 +299,8 @@ func genCal(year, m int) map[string]map[int][7]int {
 				day_no++
 			}
 		}
+
+		return
 	}
 
 	monthCal = func(i *int, month string) {
@@ -321,6 +324,8 @@ func genCal(year, m int) map[string]map[int][7]int {
 				day_no++
 			}
 		}
+
+		return
 	}
 
 	for i, month := range months {
@@ -363,6 +368,20 @@ func printWeek(k, lm, m int, keys []int, cal map[string]map[int][7]int) {
 	return
 }
 
+func sortKeys(cal map[int][7]int) (int, []int) {
+
+	var length int = len(cal)
+	var keys []int = make([]int, 0, length)
+
+	for k := range cal {
+		keys = append(keys, k)
+	}
+
+	sort.Ints(keys)
+
+	return length, keys
+}
+
 func calOfYear() {
 
 	var year int
@@ -387,22 +406,15 @@ func calOfYear() {
 		fmt.Println(dline, " ", dline)
 		fmt.Println(hline, " ", hline)
 
-		lm1 = len(cal[months[m1]])
-		lm2 = len(cal[months[m2]])
+		var keys_m1 []int
+		var keys_m2 []int
 
-		var keys_m1 []int = make([]int, 0, lm1)
-		var keys_m2 []int = make([]int, 0, lm2)
-
-		for k := range cal[months[m1]] {
-			keys_m1 = append(keys_m1, k)
-		}
+		lm1, keys_m1 = sortKeys(cal[months[m1]])
+		lm2, keys_m2 = sortKeys(cal[months[m2]])
 
 		for k := range cal[months[m2]] {
 			keys_m2 = append(keys_m2, k)
 		}
-
-		sort.Ints(keys_m1)
-		sort.Ints(keys_m2)
 
 		if lm1 > lm2 {
 			now = lm1
@@ -426,21 +438,14 @@ func calOfYear() {
 
 func calOfMonth() {
 
-	var year, month int
+	var keys []int
+	var year, month, length int
 	var cal map[string]map[int][7]int
 
 	getMonth(&year, &month)
 
 	cal = genCal(year, month)
-
-	var length int = len(cal[months[month]])
-	var keys []int = make([]int, 0, length)
-
-	for k := range cal[months[month]] {
-		keys = append(keys, k)
-	}
-
-	sort.Ints(keys)
+	length, keys = sortKeys(cal[months[month]])
 
 	fmt.Println(str_rep(" ", 14), months[month])
 
@@ -454,7 +459,45 @@ func calOfMonth() {
 	}
 
 	fmt.Println(hline)
+
+	return
 }
+
+// function under development
+func dayOfDate() {
+
+	var keys []int
+	var month_map map[int][7]int
+	var cal map[string]map[int][7]int
+	var year, month, day, length, key int
+
+	getDay(&year, &month, &day)
+
+	cal = genCal(year, month)
+
+	length, keys = sortKeys(cal[months[month]])
+	key = (keys[0] + keys[length - 1]) / 2
+	month_map = cal[months[month]]
+
+	for true {
+		if month_map[key][0] > day {
+			key -= 1
+		} else if month_map[key][6] < day && month_map[key][6] != 0 { // add condition for month_map[key][6] != 0
+			key += 1
+		} else {
+			for w, d := range month_map[key] {
+				if d == day {
+					fmt.Println(key, w)   // changes to be made
+					break
+				}
+			}
+			break
+		}
+	}
+
+	return
+}
+// function under development
 
 func main() {
 
@@ -474,6 +517,8 @@ func main() {
 			calOfYear()
 		case 2:
 			calOfMonth()
+		case 3:
+			dayOfDate()
 		}
 	}
 
